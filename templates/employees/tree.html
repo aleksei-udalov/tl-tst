@@ -1,0 +1,75 @@
+{% load static %}
+{% load bootstrap4 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Departments and employees</title>
+
+<link href="{% static 'css/bstreeview.css' %}" rel="stylesheet">
+
+</head>
+<body>
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+<script src="{% static 'js/bstreeview.js' %}"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/bootstrap-table.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/bootstrap-table.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/locale/bootstrap-table-en-US.min.js"></script>
+
+<div class="container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-6 pt-5">
+                <div id="tree">
+
+                </div>
+            </div>
+            <div class="col-md-6 pt-5">
+                <table class="table" id="employees">
+                  <thead>
+                    <tr>
+                      <th data-field="name">Name</th>
+                      <th data-field="position">Position</th>
+                      <th data-field="salary">Salary</th>
+                      <th data-field="employment_date">Employment at</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadEmployees(event) {
+        $.getJSON("employees_by_department/" + event.target.id.split("_")[1], function(data){
+            $("#employees").bootstrapTable('load', data);
+        })
+    }
+    $(document).ready(function() {
+        var table = $("#employees");
+        table.bootstrapTable({"total": 0,"rows": []});
+
+        $.getJSON("departments", function(data){
+            $('#tree').bstreeview({
+                data: data.departments,
+                expandIcon: 'fa fa-angle-down fa-fw',
+                collapseIcon: 'fa fa-angle-right fa-fw',
+                indent: 1.25,
+                parentsMarginLeft: '1.25rem',
+                openNodeLinkOnNewTab: true
+            });
+
+            $("#tree").on("click", loadEmployees);
+        })
+    }) 
+
+</script>
+
+</body>
+</html>
